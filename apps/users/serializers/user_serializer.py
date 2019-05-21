@@ -1,18 +1,19 @@
+from core.serializer import BaseSchema
 from marshmallow import Schema, fields
 
 
 # Request Serializer
-class UserRequestSerializer(Schema):
+class CreateUserRequestSchema(BaseSchema):
     email = fields.Email()
-    password = fields.Str()
+    password1 = fields.Str()
+    password2 = fields.Str()
     nickname = fields.Str()
     gender = fields.Str()
-    is_active = fields.Boolean()
-    is_block = fields.Boolean()
+    join_type = fields.Str()
 
 
 # Response Serializer
-class UserResponseSerializer(Schema):
+class UserResponseSchema(BaseSchema):
     email = fields.Email()
     nickname = fields.Str()
     gender = fields.Str()
