@@ -1,5 +1,6 @@
 # Sanic Boilerplate based on Clean Architecture
 
-- Sanic
-- Marshmallow
-- SQLAlchemy
+- Sanic(Async Webframework)
+- Marshmallow(Input Validation)
+- Gino(Database ORM)
+- PostgreSQL
