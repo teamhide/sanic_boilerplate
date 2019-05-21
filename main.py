@@ -1,9 +1,7 @@
-import os
 from sanic import Sanic
 from apps import create_app
 
 
-SANIC_CONFIG = os.getenv('SANIC_CONFIG', 'development')
 app = Sanic(__name__)
 
 
