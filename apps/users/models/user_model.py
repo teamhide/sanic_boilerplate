@@ -19,7 +19,7 @@ class User(db.Model):
     password = db.Column(db.String(50), nullable=False)
     nickname = db.Column(db.String(20), nullable=False)
     gender = db.Column(db.String(2), nullable=False)
-    join_type = db.Column(db.String(15), default='default', choices=USER_JOIN_TYPE)
+    join_type = db.Column(db.String(15), default='default')
     is_active = db.Column(db.Boolean, default=False)
     is_block = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)

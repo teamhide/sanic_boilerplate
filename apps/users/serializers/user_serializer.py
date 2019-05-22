@@ -12,6 +12,12 @@ class CreateUserRequestSchema(BaseSchema):
     join_type = fields.Str()
 
 
+class UpdateUserRequestSchema(BaseSchema):
+    password = fields.Str()
+    target_field = fields.Str()
+    value = fields.Str()
+
+
 # Response Serializer
 class UserResponseSchema(BaseSchema):
     email = fields.Email()
