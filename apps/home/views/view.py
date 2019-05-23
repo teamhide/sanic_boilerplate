@@ -5,4 +5,4 @@ from sanic.response import json
 
 class Home(HTTPMethodView):
     def get(self, request: Request) -> json:
-        return json({'result': True})
+        return json({'result': True}, status=200)
