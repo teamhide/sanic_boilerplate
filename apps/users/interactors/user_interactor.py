@@ -1,4 +1,6 @@
+from typing import Union, NoReturn
 from core.converters.user_converter import UserInteractorConverter
+from core.exceptions import DoNotHavePermissionException
 from apps.users.repositories import UserPostgreSQLRepository
 from apps.users.dtos import CreateUserDto, UpdateUserDto
 from apps.users.entities import UserEntity
@@ -11,12 +13,17 @@ class UserInteractor:
 
 
 class CreateUserInteractor(UserInteractor):
-    def execute(self, dto: CreateUserDto):
-        """권한 검사"""
-        if dto.password1 != dto.password2:
-            return
+    async def execute(self, dto: CreateUserDto) -> Union[UserEntity, NoReturn]:
+        """
+        유저를 생성하는 함수
 
-        """DTO -> Entity 변환"""
+        :param dto: CreateUserDto
+        :return: UserEntity
+        """
+
+        if dto.password1 != dto.password2:
+            raise DoNotHavePermissionException
+
         user_entity = UserEntity(
             email=dto.email,
             password=dto.password1,
@@ -28,8 +35,8 @@ class CreateUserInteractor(UserInteractor):
             is_admin=False,
         )
 
-        """User 저장"""
         self.repository.save_user(entity=user_entity)
+        return user_entity
 
 
 class UpdateUserInteractor(UserInteractor):

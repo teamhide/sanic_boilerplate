@@ -9,20 +9,20 @@ from apps.users.interactors import CreateUserInteractor, UpdateUserInteractor, G
 
 
 class User(HTTPMethodView):
-    def get(self, request: Request, user_id: int) -> Union[json, NoReturn]:
+    async def get(self, request: Request, user_id: int) -> Union[json, NoReturn]:
         user = GetUserInteractor().execute(user_id=user_id)
         response = UserResponseSchema(user)
         return json({'data': response})
 
-    def post(self, request: Request) -> Union[json, NoReturn]:
+    async def post(self, request: Request) -> Union[json, NoReturn]:
         validator = CreateUserRequestSchema().load(data=request.form)
         if validator.errors:
             raise ValidationErrorException
         create_dto = CreateUserDto(**validator.data)
-        user = CreateUserInteractor().execute(dto=create_dto)
+        user = await CreateUserInteractor().execute(dto=create_dto)
         return json({'data': user})
 
-    def put(self, request: Request) -> Union[json, NoReturn]:
+    async def put(self, request: Request) -> Union[json, NoReturn]:
         validator = UpdateUserRequestSchema().load(data=request.form)
         if validator.errors:
             raise ValidationErrorException
@@ -32,20 +32,20 @@ class User(HTTPMethodView):
 
 
 class UserList(HTTPMethodView):
-    def get(self, page: int) -> Union[json, NoReturn]:
+    async def get(self, page: int) -> Union[json, NoReturn]:
         pass
 
 
 class BlockUser(HTTPMethodView):
-    def post(self, request: Request) -> Union[json, NoReturn]:
+    async def post(self, request: Request) -> Union[json, NoReturn]:
         pass
 
 
 class DeactivateUser(HTTPMethodView):
-    def post(self, request: Request) -> Union[json, NoReturn]:
+    async def post(self, request: Request) -> Union[json, NoReturn]:
         pass
 
 
 class UpdateUserToAdmin(HTTPMethodView):
-    def post(self, request: Request) -> Union[json, NoReturn]:
+    async def post(self, request: Request) -> Union[json, NoReturn]:
         pass

@@ -1,5 +1,5 @@
 from core.serializer import BaseSchema
-from marshmallow import Schema, fields
+from marshmallow import fields
 
 
 # Request Serializer

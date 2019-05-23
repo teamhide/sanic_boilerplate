@@ -33,7 +33,9 @@ class UserPostgreSQLRepository(UserRepository):
         self.converter = UserRepositoryConverter()
 
     def save_user(self, entity: UserEntity) -> UserEntity:
-        return User.create(entity.__dict__)
+        print(entity)
+        user = User.create(entity.__dict__)
+        return user
 
     def update_user(self, query: dict) -> UserEntity:
         pass
