@@ -39,16 +39,18 @@ services:
 
   db:
     image: postgres:11.3
+    container_name: db
+    hostname: db
     ports:
       - '5432:5432'
-    volumes:
-      - ./docker/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=sanic
       - POSTGRES_PASSWORD=sanic
       - POSTGRES_DB=sanic
       - POSTGRES_INITDB_ARGS=--encoding=UTF8
     restart: on-failure
+    networks:
+      - backend
 
 networks:
   backend:
