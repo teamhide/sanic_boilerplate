@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx-dev/Dockerfile
+    container_name: nginx
+    hostname: nginx
+    ports:
+      - '80:80'
+    networks:
+      - backend
+    restart: on-failure
+    links:
+      - api
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api-dev/Dockerfile
+    container_name: api
+    hostname: api
+    ports:
+      - '8000:8000'
+    networks:
+      - backend
+    restart: on-failure
+    tty: true
+
+networks:
+  backend:
+    driver: 'bridge'
