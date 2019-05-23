@@ -16,8 +16,3 @@ class UpdateUserDto:
     password: str = None
     target_field: str = None
     value: str = None
-
-
-@dataclass
-class DeleteUserDto:
-    password: str = None

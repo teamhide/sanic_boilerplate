@@ -37,18 +37,23 @@ class UpdateUserInteractor(UserInteractor):
         pass
 
 
-class DeleteUserInteractor(UserInteractor):
-    def execute(self, dto):
-        pass
-
-
 class BlockUserInteractor(UserInteractor):
     def execute(self, dto):
         pass
 
 
-class GetUserInteractor(UserInteractor):
+class DeactivateUserInteractor(UserInteractor):
     def execute(self, dto):
+        pass
+
+
+class UpdateUserToAdminInteractor(UserInteractor):
+    def execute(self, dto):
+        pass
+
+
+class GetUserInteractor(UserInteractor):
+    def execute(self, user_id: int):
         pass
 
 
