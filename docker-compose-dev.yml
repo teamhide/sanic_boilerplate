@@ -28,6 +28,9 @@ services:
     networks:
       - backend
     restart: on-failure
+    environment:
+      - DB_HOST=sanic@db:5432
+      - DB_NAME=sanic
     tty: true
     depends_on:
       - db
@@ -36,12 +39,14 @@ services:
 
   db:
     image: postgres:11.3
+    ports:
+      - '5432:5432'
     volumes:
       - ./docker/data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=sanic
       - POSTGRES_USER=sanic
       - POSTGRES_PASSWORD=sanic
+      - POSTGRES_DB=sanic
       - POSTGRES_INITDB_ARGS=--encoding=UTF8
     restart: on-failure
 

@@ -4,7 +4,7 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: docker/nginx-dev/Dockerfile
+      dockerfile: docker/nginx-prod/Dockerfile
     container_name: nginx
     hostname: nginx
     ports:
@@ -20,7 +20,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: docker/api-dev/Dockerfile
+      dockerfile: docker/api-prod/Dockerfile
     container_name: api
     hostname: api
     ports:
