@@ -27,6 +27,8 @@ services:
       - '8000:8000'
     networks:
       - backend
+    volumes:
+      - $PWD:/home
     restart: on-failure
     environment:
       - DB_HOST=sanic@db:5432

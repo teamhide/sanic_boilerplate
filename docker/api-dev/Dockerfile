@@ -1,7 +1,8 @@
 FROM python:3.7.2
 MAINTAINER hide <sharehead@gmail.com>
 
-COPY . /home
+COPY Pipfile ./home
+COPY Pipfile.lock ./home
 WORKDIR /home
 RUN apt-get update && apt-get install -y wget
 ENV DOCKERIZE_VERSION v0.6.1
@@ -11,5 +12,4 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 RUN pip install pipenv
 RUN pipenv install --system
-RUN chmod 777 /home/docker/api-dev/run.sh
-CMD /home/docker/api-dev/run.sh
+CMD ./docker/api-dev/run.sh
