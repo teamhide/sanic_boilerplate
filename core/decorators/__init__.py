@@ -6,7 +6,7 @@ from core.exceptions import TokenHeaderException, DecodeErrorException, InvalidT
 
 def is_jwt_authenticated(function):
     @wraps(function)
-    def authenticate(request):
+    def authenticate(request, user_id: int = None):
         try:
             token = request.headers.get('Authorization').split('Bearer ')[1]
         except (IndexError, AttributeError):
@@ -14,7 +14,7 @@ def is_jwt_authenticated(function):
 
         try:
             jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-            result = function(request)
+            result = function(request, user_id)
             return result
         except jwt.exceptions.DecodeError:
             raise DecodeErrorException

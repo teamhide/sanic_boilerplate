@@ -18,15 +18,6 @@ class UpdateUserRequestSchema(BaseSchema):
     value = fields.Str()
 
 
-class BlockUserRequestSchema(BaseSchema):
-    token = fields.Str()
-    user_id = fields.Integer()
-
-
-class DeactivateUserRequestSchema(BaseSchema):
-    pass
-
-
 # Response Serializer
 class UserResponseSchema(BaseSchema):
     email = fields.Email()

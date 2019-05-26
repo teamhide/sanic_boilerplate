@@ -32,6 +32,6 @@ class UserListDto:
 
 
 @dataclass
-class BlockUserDto:
+class UpdateUserStateDto:
     token: str = None
     user_id: int = None

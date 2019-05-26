@@ -12,7 +12,7 @@ class UserRepository:
         pass
 
     @abc.abstractmethod
-    async def update_user(self, query: dict) -> UserEntity:
+    async def update_user(self, user_id: int, query: dict) -> UserEntity:
         pass
 
     @abc.abstractmethod
@@ -40,8 +40,10 @@ class UserPGRepository(UserRepository):
         user = await User.create(**self.converter.user_entity_to_dict(entity=entity))
         return self.converter.user_model_to_entity(model=user)
 
-    async def update_user(self, query: dict) -> UserEntity:
-        pass
+    async def update_user(self, user_id: int, query: dict) -> UserEntity:
+        user = await User.get(id=user_id)
+        await user.update(**query).apply()
+        return self.converter.user_model_to_entity(model=user)
 
     async def delete_user(self) -> bool:
         pass
