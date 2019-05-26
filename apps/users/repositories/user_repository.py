@@ -32,7 +32,7 @@ class UserRepository:
         pass
 
 
-class UserPostgreSQLRepository(UserRepository):
+class UserPGRepository(UserRepository):
     def __init__(self):
         self.converter = UserRepositoryConverter()
 

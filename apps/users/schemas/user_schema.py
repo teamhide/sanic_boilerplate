@@ -1,4 +1,4 @@
-from core.serializer import BaseSchema
+from core.schemas import BaseSchema
 from marshmallow import fields
 
 
@@ -16,6 +16,15 @@ class UpdateUserRequestSchema(BaseSchema):
     password = fields.Str()
     target_field = fields.Str()
     value = fields.Str()
+
+
+class BlockUserRequestSchema(BaseSchema):
+    token = fields.Str()
+    user_id = fields.Integer()
+
+
+class DeactivateUserRequestSchema(BaseSchema):
+    pass
 
 
 # Response Serializer

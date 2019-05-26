@@ -4,9 +4,12 @@ from sanic.request import Request
 from sanic.response import json
 from core.exceptions import ValidationErrorException
 from core.decorators import is_jwt_authenticated
-from apps.users.schemas import CreateUserRequestSchema, UserResponseSchema, UpdateUserRequestSchema
-from apps.users.dtos import CreateUserDto, UpdateUserDto, UserListDto
-from apps.users.interactors import CreateUserInteractor, UpdateUserInteractor, GetUserInteractor, GetUserListInteractor
+from core.utils import TokenExtractor
+from apps.users.schemas import CreateUserRequestSchema, UserResponseSchema, UpdateUserRequestSchema,\
+    BlockUserRequestSchema
+from apps.users.dtos import CreateUserDto, UpdateUserDto, UserListDto, BlockUserDto
+from apps.users.interactors import CreateUserInteractor, UpdateUserInteractor, GetUserInteractor, GetUserListInteractor,\
+    BlockUserInteractor
 
 
 class User(HTTPMethodView):
@@ -47,8 +50,16 @@ class UserList(HTTPMethodView):
 
 
 class BlockUser(HTTPMethodView):
+    decorators = [is_jwt_authenticated]
+
     async def post(self, request: Request) -> Union[json, NoReturn]:
-        pass
+        token = TokenExtractor(request=request).extract()
+        validator = BlockUserRequestSchema().load(data=request.form)
+        if validator.errors:
+            raise ValidationErrorException
+        block_dto = BlockUserDto(token, **validator.data)
+        BlockUserInteractor().execute(dto=block_dto)
+        return json({'data': True})
 
 
 class DeactivateUser(HTTPMethodView):

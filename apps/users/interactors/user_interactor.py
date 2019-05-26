@@ -1,16 +1,16 @@
 import jwt
-from typing import Union, NoReturn
+from typing import Union, NoReturn, Optional
 from core.converters.user_converter import UserInteractorConverter
 from core.exceptions import DoNotHavePermissionException, LoginFailException
 from core.config import JWT_SECRET_KEY, JWT_ALGORITHM
-from apps.users.repositories import UserPostgreSQLRepository
-from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginUserDto, UserListDto
+from apps.users.repositories import UserPGRepository
+from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginUserDto, UserListDto, BlockUserDto
 from apps.users.entities import UserEntity
 
 
 class UserInteractor:
     def __init__(self):
-        self.repository = UserPostgreSQLRepository()
+        self.repository = UserPGRepository()
         self.converter = UserInteractorConverter()
 
 
@@ -22,7 +22,7 @@ class LoginInteractor(UserInteractor):
         :param dto: CreateUserDto
         :return: token
         """
-        user = self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
+        user = await self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
         if user is False:
             raise LoginFailException
         return self._make_jwt(entity=user)
@@ -65,8 +65,8 @@ class UpdateUserInteractor(UserInteractor):
 
 
 class BlockUserInteractor(UserInteractor):
-    def execute(self, dto):
-        pass
+    def execute(self, dto: BlockUserDto) -> Optional[NoReturn]:
+        print(dto)
 
 
 class DeactivateUserInteractor(UserInteractor):

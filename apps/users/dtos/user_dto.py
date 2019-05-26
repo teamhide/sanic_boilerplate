@@ -29,3 +29,9 @@ class LoginUserDto:
 class UserListDto:
     offset: int = None
     limit: int = None
+
+
+@dataclass
+class BlockUserDto:
+    token: str = None
+    user_id: int = None
