@@ -3,12 +3,15 @@ from sanic.views import HTTPMethodView
 from sanic.request import Request
 from sanic.response import json
 from core.exceptions import ValidationErrorException
+from core.decorators import is_jwt_authenticated
 from apps.users.schemas import CreateUserRequestSchema, UserResponseSchema, UpdateUserRequestSchema
 from apps.users.dtos import CreateUserDto, UpdateUserDto
 from apps.users.interactors import CreateUserInteractor, UpdateUserInteractor, GetUserInteractor
 
 
 class User(HTTPMethodView):
+    decorators = [is_jwt_authenticated]
+
     async def get(self, request: Request, user_id: int) -> Union[json, NoReturn]:
         user = GetUserInteractor().execute(user_id=user_id)
         response = UserResponseSchema(user)
@@ -32,8 +35,10 @@ class User(HTTPMethodView):
 
 
 class UserList(HTTPMethodView):
+    decorators = [is_jwt_authenticated]
+
     async def get(self, page: int) -> Union[json, NoReturn]:
-        pass
+        return json({"result": True})
 
 
 class BlockUser(HTTPMethodView):
