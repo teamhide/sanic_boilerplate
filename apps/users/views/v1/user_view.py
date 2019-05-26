@@ -4,6 +4,7 @@ from sanic.request import Request
 from sanic.response import json
 from core.exceptions import ValidationErrorException
 from core.decorators import is_jwt_authenticated
+from core.responses import response
 from core.utils import TokenHelper
 from apps.users.schemas import CreateUserRequestSchema, UserResponseSchema, UpdateUserRequestSchema
 from apps.users.dtos import CreateUserDto, UpdateUserDto, UserListDto, UpdateUserStateDto
@@ -15,9 +16,9 @@ class User(HTTPMethodView):
     decorators = [is_jwt_authenticated]
 
     async def get(self, request: Request, user_id: int) -> Union[json, NoReturn]:
-        user = await GetUserInteractor().execute(user_id=user_id)
-        response = UserResponseSchema(user)
-        return json({'data': response})
+        user_entity = await GetUserInteractor().execute(user_id=user_id)
+        user = UserResponseSchema().dump(user_entity)
+        return response(user)
 
     async def put(self, request: Request, user_id: int) -> Union[json, NoReturn]:
         validator = UpdateUserRequestSchema().load(data=request.form)
@@ -25,10 +26,10 @@ class User(HTTPMethodView):
             raise ValidationErrorException
         dto = UpdateUserDto(**validator.data)
         user = await UpdateUserInteractor().execute(dto=dto)
-        return json({'data': user})
+        return response(body=user)
 
     async def delete(self, request: Request, user_id: int) -> Union[json, NoReturn]:
-        return json({'result': True})
+        return response(body={'result': True})
 
 
 class UserList(HTTPMethodView):
@@ -37,7 +38,7 @@ class UserList(HTTPMethodView):
     async def get(self, request: Request) -> Union[json, NoReturn]:
         dto = UserListDto(offset=request.args.get('offset'), limit=request.args.get('limit'))
         users = await GetUserListInteractor().execute(dto=dto)
-        return json({'data': users})
+        return response(body=users)
 
     async def post(self, request: Request) -> Union[json, NoReturn]:
         validator = CreateUserRequestSchema().load(data=request.form)
@@ -45,7 +46,7 @@ class UserList(HTTPMethodView):
             raise ValidationErrorException
         dto = CreateUserDto(**validator.data)
         user = await CreateUserInteractor().execute(dto=dto)
-        return json({'data': user})
+        return response(body=user)
 
 
 class BlockUser(HTTPMethodView):
@@ -55,7 +56,7 @@ class BlockUser(HTTPMethodView):
         token = TokenHelper().extract_from_request(request=request)
         dto = UpdateUserStateDto(token=token, user_id=user_id)
         await BlockUserInteractor().execute(dto=dto)
-        return json({'data': True})
+        return response(body={'result': True})
 
 
 class DeactivateUser(HTTPMethodView):
@@ -63,7 +64,7 @@ class DeactivateUser(HTTPMethodView):
         token = TokenHelper().extract_from_request(request=request)
         dto = UpdateUserStateDto(token=token, user_id=user_id)
         await DeactivateUserInteractor().execute(dto=dto)
-        return json({'data': True})
+        return response(body={'result': True})
 
 
 class UpdateUserToAdmin(HTTPMethodView):
@@ -71,4 +72,4 @@ class UpdateUserToAdmin(HTTPMethodView):
         token = TokenHelper().extract_from_request(request=request)
         dto = UpdateUserStateDto(token=token, user_id=user_id)
         await UpdateUserToAdminInteractor().execute(dto=dto)
-        return json({'data': True})
+        return response(body={'result': True})
