@@ -16,3 +16,10 @@ class UpdateUserDto:
     password: str = None
     target_field: str = None
     value: str = None
+
+
+@dataclass
+class LoginUserDto:
+    email: str = None
+    password: str = None
+    join_type: str = None

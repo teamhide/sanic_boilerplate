@@ -10,6 +10,7 @@ sanic = "*"
 marshmallow = "*"
 gino = "*"
 alembic = "*"
+pyjwt = "*"
 
 [requires]
 python_version = "3.7"

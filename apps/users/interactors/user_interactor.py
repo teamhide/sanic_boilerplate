@@ -1,8 +1,10 @@
+import jwt
 from typing import Union, NoReturn
 from core.converters.user_converter import UserInteractorConverter
-from core.exceptions import DoNotHavePermissionException
+from core.exceptions import DoNotHavePermissionException, LoginFailException
+from core.config import JWT_SECRET_KEY, JWT_ALGORITHM
 from apps.users.repositories import UserPostgreSQLRepository
-from apps.users.dtos import CreateUserDto, UpdateUserDto
+from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginUserDto
 from apps.users.entities import UserEntity
 
 
@@ -10,6 +12,27 @@ class UserInteractor:
     def __init__(self):
         self.repository = UserPostgreSQLRepository()
         self.converter = UserInteractorConverter()
+
+
+class LoginInteractor(UserInteractor):
+    async def execute(self, dto: LoginUserDto) -> Union[str, NoReturn]:
+        """
+        유저 로그인 함수
+
+        :param dto: CreateUserDto
+        :return: token
+        """
+        user = self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
+        if user is False:
+            raise LoginFailException
+        return self._make_jwt(entity=user)
+
+    async def _make_jwt(self, entity: UserEntity) -> str:
+        return jwt.encode(
+            payload={'email': entity.email},
+            key=JWT_SECRET_KEY,
+            algorithm=JWT_ALGORITHM
+        )
 
 
 class CreateUserInteractor(UserInteractor):

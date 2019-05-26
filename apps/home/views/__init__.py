@@ -1,1 +1,1 @@
-from .view import *
+from .home_view import *

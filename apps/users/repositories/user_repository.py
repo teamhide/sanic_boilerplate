@@ -27,13 +27,16 @@ class UserRepository:
     def get_user_list(self, offset: int, limit: int):
         pass
 
+    @abc.abstractmethod
+    def user_login(self, email: str, password: str, join_type: str) -> UserEntity:
+        pass
+
 
 class UserPostgreSQLRepository(UserRepository):
     def __init__(self):
         self.converter = UserRepositoryConverter()
 
     def save_user(self, entity: UserEntity) -> UserEntity:
-        print(entity)
         user = User.create(entity.__dict__)
         return user
 
@@ -48,3 +51,7 @@ class UserPostgreSQLRepository(UserRepository):
 
     def get_user_list(self, offset: int, limit: int):
         pass
+
+    def user_login(self, email: str, password: str, join_type: str) -> UserEntity:
+        user = User.get(email=email, password=password, join_type=join_type)
+        return self.converter.user_model_to_entity(model=user)
