@@ -1,3 +1,4 @@
+import bcrypt
 from typing import Union, NoReturn, Optional
 from core.converters.user_converter import UserInteractorConverter
 from core.exceptions import DoNotHavePermissionException, LoginFailException
@@ -25,7 +26,14 @@ class LoginInteractor(UserInteractor):
         user = await self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
         if user is False:
             raise LoginFailException
+
+        if not await self._check_password(password=dto.password, stored_hash=user.password):
+            raise DoNotHavePermissionException
+
         return self.token.encode(user_id=user.id)
+
+    async def _check_password(self, password: str, stored_hash: str) -> bool:
+        return await bcrypt.hashpw(password.encode('utf8'), stored_hash) == stored_hash
 
 
 class CreateUserInteractor(UserInteractor):
@@ -40,9 +48,11 @@ class CreateUserInteractor(UserInteractor):
         if dto.password1 != dto.password2:
             raise DoNotHavePermissionException
 
+        hashed_password = await self._create_hash(password=dto.password1)
+
         user_entity = UserEntity(
             email=dto.email,
-            password=dto.password1,
+            password=hashed_password,
             nickname=dto.nickname,
             gender=dto.gender,
             join_type=dto.join_type,
@@ -50,6 +60,10 @@ class CreateUserInteractor(UserInteractor):
 
         await self.repository.save_user(entity=user_entity)
         return user_entity
+
+    async def _create_hash(self, password: str) -> str:
+        salt = bcrypt.gensalt()
+        return await bcrypt.hashpw(password=password, salt=salt)
 
 
 class UpdateUserInteractor(UserInteractor):
