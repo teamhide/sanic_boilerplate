@@ -14,7 +14,7 @@ class User(db.Model):
         ('F', 'Female')
     )
 
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    id = db.Column(db.BigInteger(), autoincrement=True, primary_key=True)
     email = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)
     nickname = db.Column(db.String(20), nullable=False)

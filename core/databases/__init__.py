@@ -1,4 +1,4 @@
-from gino import Gino
+from gino.ext.sanic import Gino
 
 
 db = Gino()

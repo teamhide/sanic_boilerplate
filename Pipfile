@@ -11,6 +11,7 @@ marshmallow = "*"
 gino = "*"
 alembic = "*"
 pyjwt = "*"
+pytest-sanic = "*"
 
 [requires]
 python_version = "3.7"

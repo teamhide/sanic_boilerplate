@@ -7,8 +7,6 @@ from core.exceptions import TokenHeaderException, DecodeErrorException, InvalidT
 def is_jwt_authenticated(function):
     @wraps(function)
     def authenticate(request):
-        # encode = jwt.encode(payload={'hide': 1}, key=JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-        # print(encode)
         try:
             token = request.headers.get('Authorization').split('Bearer ')[1]
         except (IndexError, AttributeError):
