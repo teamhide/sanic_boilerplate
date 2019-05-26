@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 @dataclass
 class UserEntity:
-    id: int = None
     email: str = None
     password: str = None
     nickname: str = None

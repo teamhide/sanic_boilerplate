@@ -53,12 +53,9 @@ class CreateUserInteractor(UserInteractor):
             nickname=dto.nickname,
             gender=dto.gender,
             join_type=dto.join_type,
-            is_active=True,
-            is_block=False,
-            is_admin=False,
         )
 
-        self.repository.save_user(entity=user_entity)
+        await self.repository.save_user(entity=user_entity)
         return user_entity
 
 
@@ -83,8 +80,9 @@ class UpdateUserToAdminInteractor(UserInteractor):
 
 
 class GetUserInteractor(UserInteractor):
-    def execute(self, user_id: int):
-        pass
+    async def execute(self, user_id: int):
+        user = await self.repository.get_user(user_id=user_id)
+        print(user)
 
 
 class GetUserListInteractor(UserInteractor):

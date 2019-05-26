@@ -10,7 +10,7 @@ from apps.users.interactors import CreateUserInteractor, UpdateUserInteractor, G
 
 
 class User(HTTPMethodView):
-    decorators = [is_jwt_authenticated]
+    # decorators = [is_jwt_authenticated]
 
     async def get(self, request: Request, user_id: int) -> Union[json, NoReturn]:
         user = GetUserInteractor().execute(user_id=user_id)
@@ -30,7 +30,7 @@ class User(HTTPMethodView):
 
 
 class UserList(HTTPMethodView):
-    decorators = [is_jwt_authenticated]
+    # decorators = [is_jwt_authenticated]
 
     async def get(self, request: Request) -> Union[json, NoReturn]:
         return json({"result": True})

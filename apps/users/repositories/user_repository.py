@@ -8,27 +8,27 @@ class UserRepository:
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def save_user(self, entity: UserEntity) -> UserEntity:
+    async def save_user(self, entity: UserEntity) -> UserEntity:
         pass
 
     @abc.abstractmethod
-    def update_user(self, query: dict) -> UserEntity:
+    async def update_user(self, query: dict) -> UserEntity:
         pass
 
     @abc.abstractmethod
-    def delete_user(self) -> bool:
+    async def delete_user(self) -> bool:
         pass
 
     @abc.abstractmethod
-    def get_user(self, user_id: int) -> UserEntity:
+    async def get_user(self, user_id: int) -> UserEntity:
         pass
 
     @abc.abstractmethod
-    def get_user_list(self, offset: int, limit: int):
+    async def get_user_list(self, offset: int, limit: int):
         pass
 
     @abc.abstractmethod
-    def user_login(self, email: str, password: str, join_type: str) -> UserEntity:
+    async def user_login(self, email: str, password: str, join_type: str) -> UserEntity:
         pass
 
 
@@ -36,22 +36,22 @@ class UserPostgreSQLRepository(UserRepository):
     def __init__(self):
         self.converter = UserRepositoryConverter()
 
-    def save_user(self, entity: UserEntity) -> UserEntity:
-        user = User.create(entity.__dict__)
-        return user
+    async def save_user(self, entity: UserEntity) -> UserEntity:
+        user = await User.create(**self.converter.user_entity_to_dict(entity=entity))
+        return self.converter.user_model_to_entity(model=user)
 
-    def update_user(self, query: dict) -> UserEntity:
+    async def update_user(self, query: dict) -> UserEntity:
         pass
 
-    def delete_user(self) -> bool:
+    async def delete_user(self) -> bool:
         pass
 
-    def get_user(self, user_id: int) -> UserEntity:
+    async def get_user(self, user_id: int) -> UserEntity:
+        return await User.get(user_id)
+
+    async def get_user_list(self, offset: int, limit: int):
         pass
 
-    def get_user_list(self, offset: int, limit: int):
-        pass
-
-    def user_login(self, email: str, password: str, join_type: str) -> UserEntity:
-        user = User.get(email=email, password=password, join_type=join_type)
+    async def user_login(self, email: str, password: str, join_type: str) -> UserEntity:
+        user = await User.get(email=email, password=password, join_type=join_type)
         return self.converter.user_model_to_entity(model=user)
