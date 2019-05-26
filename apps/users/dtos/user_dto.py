@@ -23,3 +23,9 @@ class LoginUserDto:
     email: str = None
     password: str = None
     join_type: str = None
+
+
+@dataclass
+class UserListDto:
+    offset: int = None
+    limit: int = None

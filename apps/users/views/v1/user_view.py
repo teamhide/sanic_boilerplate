@@ -5,15 +5,15 @@ from sanic.response import json
 from core.exceptions import ValidationErrorException
 from core.decorators import is_jwt_authenticated
 from apps.users.schemas import CreateUserRequestSchema, UserResponseSchema, UpdateUserRequestSchema
-from apps.users.dtos import CreateUserDto, UpdateUserDto
-from apps.users.interactors import CreateUserInteractor, UpdateUserInteractor, GetUserInteractor
+from apps.users.dtos import CreateUserDto, UpdateUserDto, UserListDto
+from apps.users.interactors import CreateUserInteractor, UpdateUserInteractor, GetUserInteractor, GetUserListInteractor
 
 
 class User(HTTPMethodView):
-    # decorators = [is_jwt_authenticated]
+    decorators = [is_jwt_authenticated]
 
     async def get(self, request: Request, user_id: int) -> Union[json, NoReturn]:
-        user = GetUserInteractor().execute(user_id=user_id)
+        user = await GetUserInteractor().execute(user_id=user_id)
         response = UserResponseSchema(user)
         return json({'data': response})
 
@@ -22,7 +22,7 @@ class User(HTTPMethodView):
         if validator.errors:
             raise ValidationErrorException
         update_dto = UpdateUserDto(**validator.data)
-        user = UpdateUserInteractor().execute(dto=update_dto)
+        user = await UpdateUserInteractor().execute(dto=update_dto)
         return json({'data': user})
 
     async def delete(self, request: Request, user_id: int) -> Union[json, NoReturn]:
@@ -30,10 +30,12 @@ class User(HTTPMethodView):
 
 
 class UserList(HTTPMethodView):
-    # decorators = [is_jwt_authenticated]
+    decorators = [is_jwt_authenticated]
 
     async def get(self, request: Request) -> Union[json, NoReturn]:
-        return json({"result": True})
+        dto = UserListDto(offset=request.args.get('offset'), limit=request.args.get('limit'))
+        users = await GetUserListInteractor().execute(dto=dto)
+        return json({'data': users})
 
     async def post(self, request: Request) -> Union[json, NoReturn]:
         validator = CreateUserRequestSchema().load(data=request.form)

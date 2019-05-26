@@ -4,7 +4,7 @@ from core.converters.user_converter import UserInteractorConverter
 from core.exceptions import DoNotHavePermissionException, LoginFailException
 from core.config import JWT_SECRET_KEY, JWT_ALGORITHM
 from apps.users.repositories import UserPostgreSQLRepository
-from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginUserDto
+from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginUserDto, UserListDto
 from apps.users.entities import UserEntity
 
 
@@ -81,10 +81,9 @@ class UpdateUserToAdminInteractor(UserInteractor):
 
 class GetUserInteractor(UserInteractor):
     async def execute(self, user_id: int):
-        user = await self.repository.get_user(user_id=user_id)
-        print(user)
+        return await self.repository.get_user(user_id=user_id)
 
 
 class GetUserListInteractor(UserInteractor):
-    def execute(self, dto):
-        pass
+    async def execute(self, dto: UserListDto = None):
+        return await self.repository.get_user_list(**dto.__dict__)

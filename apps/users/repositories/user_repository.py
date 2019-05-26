@@ -47,10 +47,16 @@ class UserPostgreSQLRepository(UserRepository):
         pass
 
     async def get_user(self, user_id: int) -> UserEntity:
-        return await User.get(user_id)
+        user = await User.get(user_id)
+        return self.converter.user_model_to_entity(model=user)
 
-    async def get_user_list(self, offset: int, limit: int):
-        pass
+    async def get_user_list(self, offset: int = 1, limit: int = 1):
+        users = await User.query.gino.all()
+        user_entity = [
+            self.converter.user_model_to_entity(model=user)
+            for user in users
+        ]
+        return user_entity
 
     async def user_login(self, email: str, password: str, join_type: str) -> UserEntity:
         user = await User.get(email=email, password=password, join_type=join_type)
