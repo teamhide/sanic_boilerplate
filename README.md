@@ -7,3 +7,5 @@
 - Alembic(Migration tool)
 - Django like project structure
 - Based on Clean Architecture
+- Docker-compose(Production/Development)
+- Apply docker hot-reload
