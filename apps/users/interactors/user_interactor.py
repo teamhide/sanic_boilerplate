@@ -1,5 +1,5 @@
 import bcrypt
-from typing import Union, NoReturn, Optional
+from typing import Union, NoReturn, Optional, List
 from core.converters.user_converter import UserInteractorConverter
 from core.exceptions import DoNotHavePermissionException, LoginFailException
 from core.utils import TokenHelper
@@ -21,7 +21,7 @@ class LoginInteractor(UserInteractor):
         유저 로그인 함수
 
         :param dto: CreateUserDto
-        :return: token
+        :return: token|NoReturn
         """
         user = await self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
         if user is False:
@@ -42,7 +42,7 @@ class CreateUserInteractor(UserInteractor):
         유저를 생성하는 함수
 
         :param dto: CreateUserDto
-        :return: UserEntity
+        :return: UserEntity|NoReturn
         """
 
         if dto.password1 != dto.password2:
@@ -67,7 +67,13 @@ class CreateUserInteractor(UserInteractor):
 
 
 class UpdateUserInteractor(UserInteractor):
-    def execute(self, dto: UpdateUserDto):
+    def execute(self, dto: UpdateUserDto) -> Union[UserEntity, NoReturn]:
+        """
+        유저를 수정하는 함수
+
+        :param dto: UpdateUserDto
+        :return: UserEntity|NoReturn
+        """
         pass
 
 
@@ -77,7 +83,7 @@ class BlockUserInteractor(UserInteractor):
         유저를 블락처리 시키는 함수
 
         :param dto: UpdateUserStateDto
-        :return: None
+        :return: NoReturn|None
         """
 
         payload = self.token.decode(token=dto.token)
@@ -92,12 +98,12 @@ class BlockUserInteractor(UserInteractor):
 
 
 class DeactivateUserInteractor(UserInteractor):
-    async def execute(self, dto: UpdateUserStateDto):
+    async def execute(self, dto: UpdateUserStateDto) -> Optional[NoReturn]:
         """
         유저를 휴면처리 시키는 함수
 
         :param dto: UpdateUserStateDto
-        :return: None
+        :return: NoReturn|None
         """
 
         payload = self.token.decode(token=dto.token)
@@ -112,12 +118,12 @@ class DeactivateUserInteractor(UserInteractor):
 
 
 class UpdateUserToAdminInteractor(UserInteractor):
-    async def execute(self, dto: UpdateUserStateDto):
+    async def execute(self, dto: UpdateUserStateDto) -> Optional[NoReturn]:
         """
         유저를 관리자로 변경처리 시키는 함수
 
         :param dto: UpdateUserStateDto
-        :return: None
+        :return: NoReturn|None
         """
 
         payload = self.token.decode(token=dto.token)
@@ -132,10 +138,24 @@ class UpdateUserToAdminInteractor(UserInteractor):
 
 
 class GetUserInteractor(UserInteractor):
-    async def execute(self, user_id: int):
+    async def execute(self, user_id: int) -> Union[UserEntity, NoReturn]:
+        """
+        단일 유저를 가져오는 함수
+
+        :param user_id: int
+        :return: UserEntity|NoReturn
+        """
+
         return await self.repository.get_user(user_id=user_id)
 
 
 class GetUserListInteractor(UserInteractor):
-    async def execute(self, dto: UserListDto = None):
+    async def execute(self, dto: UserListDto = None) -> Union[List[UserEntity], NoReturn]:
+        """
+        유저 리스트를 가져오는 함수
+
+        :param dto: UserListDto
+        :return: List[UserEntity]|NoReturn
+        """
+
         return await self.repository.get_user_list(**dto.__dict__)
