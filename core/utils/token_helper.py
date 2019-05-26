@@ -5,19 +5,22 @@ from core.config import JWT_SECRET_KEY, JWT_ALGORITHM
 
 
 class TokenHelper:
-    def __init__(self):
-        pass
-
-    def extract_from_request(self, request: Request):
+    @classmethod
+    def extract_from_request(cls, request: Request):
         try:
             return request.headers.get('Authorization').split('Bearer ')[1]
         except (IndexError, AttributeError):
             raise TokenHeaderException
 
-    def decode(self, token: str) -> dict:
+    @classmethod
+    def decode(cls, token: str) -> dict:
         try:
             return jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         except jwt.exceptions.DecodeError:
             raise DecodeErrorException
         except jwt.exceptions.InvalidTokenError:
             raise InvalidTokenException
+
+    @classmethod
+    def encode(cls, user_id: int):
+        return jwt.encode(payload={'user_id': user_id}, key=JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)

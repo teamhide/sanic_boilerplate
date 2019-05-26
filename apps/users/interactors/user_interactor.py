@@ -1,8 +1,6 @@
-import jwt
 from typing import Union, NoReturn, Optional
 from core.converters.user_converter import UserInteractorConverter
 from core.exceptions import DoNotHavePermissionException, LoginFailException
-from core.config import JWT_SECRET_KEY, JWT_ALGORITHM
 from core.utils import TokenHelper
 from apps.users.repositories import UserPGRepository
 from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginUserDto, UserListDto, UpdateUserStateDto
@@ -13,6 +11,7 @@ class UserInteractor:
     def __init__(self):
         self.repository = UserPGRepository()
         self.converter = UserInteractorConverter()
+        self.token = TokenHelper()
 
 
 class LoginInteractor(UserInteractor):
@@ -26,14 +25,7 @@ class LoginInteractor(UserInteractor):
         user = await self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
         if user is False:
             raise LoginFailException
-        return self._make_jwt(entity=user)
-
-    async def _make_jwt(self, entity: UserEntity) -> str:
-        return jwt.encode(
-            payload={'email': entity.email},
-            key=JWT_SECRET_KEY,
-            algorithm=JWT_ALGORITHM
-        )
+        return self.token.encode(user_id=user.id)
 
 
 class CreateUserInteractor(UserInteractor):
@@ -67,11 +59,19 @@ class UpdateUserInteractor(UserInteractor):
 
 class BlockUserInteractor(UserInteractor):
     async def execute(self, dto: UpdateUserStateDto) -> Optional[NoReturn]:
-        payload = TokenHelper().decode(token=dto.token)
+        """
+        유저를 블락처리 시키는 함수
 
-        # TODO: 토큰의 권한이 관리자인지 확인하는 루틴 추가 필요
+        :param dto: UpdateUserStateDto
+        :return: None
+        """
 
-        # Build Query
+        payload = self.token.decode(token=dto.token)
+
+        is_admin = self.repository.get_user(user_id=payload.get('user_id'))
+        if is_admin is False:
+            raise DoNotHavePermissionException
+
         query = {'is_block': True}
 
         await self.repository.update_user(user_id=dto.user_id, query=query)
@@ -79,11 +79,19 @@ class BlockUserInteractor(UserInteractor):
 
 class DeactivateUserInteractor(UserInteractor):
     async def execute(self, dto: UpdateUserStateDto):
-        payload = TokenHelper().decode(token=dto.token)
+        """
+        유저를 휴면처리 시키는 함수
 
-        # TODO: 토큰의 권한이 관리자인지 확인하는 루틴 추가 필요
+        :param dto: UpdateUserStateDto
+        :return: None
+        """
 
-        # Build Query
+        payload = self.token.decode(token=dto.token)
+
+        is_admin = self.repository.get_user(user_id=payload.get('user_id'))
+        if is_admin is False:
+            raise DoNotHavePermissionException
+
         query = {'is_active': False}
 
         await self.repository.update_user(user_id=dto.user_id, query=query)
@@ -91,11 +99,19 @@ class DeactivateUserInteractor(UserInteractor):
 
 class UpdateUserToAdminInteractor(UserInteractor):
     async def execute(self, dto: UpdateUserStateDto):
-        payload = TokenHelper().decode(token=dto.token)
+        """
+        유저를 관리자로 변경처리 시키는 함수
 
-        # TODO: 토큰의 권한이 관리자인지 확인하는 루틴 추가 필요
+        :param dto: UpdateUserStateDto
+        :return: None
+        """
 
-        # Build Query
+        payload = self.token.decode(token=dto.token)
+
+        is_admin = self.repository.get_user(user_id=payload.get('user_id'))
+        if is_admin is False:
+            raise DoNotHavePermissionException
+
         query = {'is_admin': True}
 
         await self.repository.update_user(user_id=dto.user_id, query=query)
