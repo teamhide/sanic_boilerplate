@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 
 @dataclass
@@ -12,3 +13,5 @@ class UserEntity:
     is_active: bool = True
     is_block: bool = False
     is_admin: bool = False
+    created_at: datetime = None
+    updated_at: datetime = None
