@@ -1,4 +1,7 @@
+-- Auto Increment를 위한 Sequence 생성
 CREATE SEQUENCE user_id_seq START 1;
+
+-- Users 테이블 생성
 CREATE TABLE users
 (id bigint primary key default nextval('user_id_seq'),
 email varchar(50),
