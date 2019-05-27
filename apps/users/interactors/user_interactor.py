@@ -63,7 +63,7 @@ class CreateUserInteractor(UserInteractor):
 
     async def _create_hash(self, password: str) -> str:
         salt = bcrypt.gensalt()
-        return await bcrypt.hashpw(password=password, salt=salt)
+        return str(bcrypt.hashpw(password=password.encode('utf8'), salt=salt))
 
 
 class UpdateUserInteractor(UserInteractor):

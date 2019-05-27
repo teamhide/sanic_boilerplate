@@ -13,7 +13,7 @@ from apps.users.interactors import CreateUserInteractor, UpdateUserInteractor, G
 
 
 class User(HTTPMethodView):
-    decorators = [is_jwt_authenticated]
+    # decorators = [is_jwt_authenticated]
 
     async def get(self, request: Request, user_id: int) -> Union[json, NoReturn]:
         user_entity = await GetUserInteractor().execute(user_id=user_id)
@@ -33,7 +33,7 @@ class User(HTTPMethodView):
 
 
 class UserList(HTTPMethodView):
-    decorators = [is_jwt_authenticated]
+    # decorators = [is_jwt_authenticated]
 
     async def get(self, request: Request) -> Union[json, NoReturn]:
         dto = UserListDto(offset=request.args.get('offset'), limit=request.args.get('limit'))
@@ -50,7 +50,7 @@ class UserList(HTTPMethodView):
 
 
 class BlockUser(HTTPMethodView):
-    decorators = [is_jwt_authenticated]
+    # decorators = [is_jwt_authenticated]
 
     async def post(self, request: Request, user_id: int) -> Union[json, NoReturn]:
         token = TokenHelper().extract_from_request(request=request)

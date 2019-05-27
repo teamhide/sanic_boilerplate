@@ -16,10 +16,6 @@ class UserRepository:
         pass
 
     @abc.abstractmethod
-    async def delete_user(self) -> bool:
-        pass
-
-    @abc.abstractmethod
     async def get_user(self, user_id: int) -> UserEntity:
         pass
 
@@ -44,9 +40,6 @@ class UserPGRepository(UserRepository):
         user = await User.get(id=user_id)
         await user.update(**query).apply()
         return self.converter.user_model_to_entity(model=user)
-
-    async def delete_user(self) -> bool:
-        pass
 
     async def get_user(self, user_id: int) -> UserEntity:
         user = await User.get(user_id)
