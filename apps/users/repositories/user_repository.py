@@ -33,9 +33,9 @@ class UserPGRepository(UserRepository):
         self.converter = UserRepositoryConverter()
 
     async def save_user(self, entity: UserEntity) -> UserEntity:
-        query = self.converter.user_entity_to_dict(entity=entity)
-        query.pop('id')
-        user = await User.create(**query)
+        user = self.converter.user_entity_to_dict(entity=entity)
+        user.pop('id')
+        user = await User.create(**user)
         return self.converter.user_model_to_entity(model=user)
 
     async def update_user(self, user_id: int, query: dict) -> UserEntity:
