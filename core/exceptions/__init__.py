@@ -55,3 +55,10 @@ class TokenHeaderException(SanicException):
     def __init__(self):
         message = 'Invalid token headers'
         super().__init__(message=message)
+
+
+@add_status_code(401)
+class UnknownFieldException(SanicException):
+    def __init__(self):
+        message = 'Unknown field inside request'
+        super().__init__(message=message)
