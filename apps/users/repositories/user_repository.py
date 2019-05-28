@@ -1,5 +1,6 @@
 import abc
 from core.converters.user_converter import UserRepositoryConverter
+from core.exceptions import NotFoundException
 from apps.users.models import User
 from apps.users.entities import UserEntity
 
@@ -45,10 +46,14 @@ class UserPGRepository(UserRepository):
 
     async def get_user(self, user_id: int) -> UserEntity:
         user = await User.get(user_id)
+        if user is None:
+            raise NotFoundException
         return self.converter.user_model_to_entity(model=user)
 
     async def get_user_list(self, offset: int = 1, limit: int = 1):
         users = await User.query.gino.all()
+        if users is None:
+            raise NotFoundException
         user_entity = [
             self.converter.user_model_to_entity(model=user)
             for user in users

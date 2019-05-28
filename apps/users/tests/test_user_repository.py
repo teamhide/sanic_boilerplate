@@ -1,10 +1,15 @@
-from apps.users.models import User
+import pytest
 from apps.users.tests import app
+from apps.users.models import User
 
 
-async def test_save_user(app: app):
-    await User.query.gino.all()
-    assert app == 1
+# @pytest.fixture
+# async def app():
+#     await db.set_bind('postgresql://localhost/sanic')
+
+
+async def test_save_user(app):
+    u1 = await User.create(nickname='fantix')
 
 
 async def test_update_user():

@@ -88,7 +88,7 @@ class BlockUserInteractor(UserInteractor):
 
         payload = self.token.decode(token=dto.token)
 
-        is_admin = self.repository.get_user(user_id=payload.get('user_id'))
+        is_admin = await self.repository.get_user(user_id=payload.get('user_id'))
         if is_admin is False:
             raise DoNotHavePermissionException
 
