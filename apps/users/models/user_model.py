@@ -18,7 +18,7 @@ class User(db.Model):
 
     id = db.Column(db.BigInteger(), Sequence('user_id_seq'), primary_key=True, autoincrement=True)
     email = db.Column(db.String(50), nullable=False)
-    password = db.Column(db.String(62), nullable=False)
+    password = db.Column(db.String(80), nullable=False)
     nickname = db.Column(db.String(20), nullable=False)
     gender = db.Column(db.String(2), nullable=False)
     join_type = db.Column(db.String(15), default='default')

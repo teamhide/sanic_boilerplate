@@ -1,6 +1,7 @@
 import pytest
 from apps.users.repositories import UserPGRepository
-from apps.users.interactors import LoginInteractor
+from apps.users.interactors import LoginInteractor, CreateUserInteractor, UpdateUserInteractor, BlockUserInteractor,\
+    DeactivateUserInteractor, UpdateUserToAdminInteractor, GetUserInteractor, GetUserListInteractor
 from apps.users.models import User
 from apps.users.entities import UserEntity
 
@@ -35,6 +36,41 @@ def repository():
 @pytest.fixture
 def login_interactor():
     return LoginInteractor()
+
+
+@pytest.fixture
+def create_user_interactor():
+    return CreateUserInteractor()
+
+
+@pytest.fixture
+def update_user_interactor():
+    return UpdateUserInteractor()
+
+
+@pytest.fixture
+def block_user_interactor():
+    return BlockUserInteractor()
+
+
+@pytest.fixture
+def deactivate_user_interactor():
+    return DeactivateUserInteractor()
+
+
+@pytest.fixture
+def update_user_to_admin_interactor():
+    return UpdateUserToAdminInteractor()
+
+
+@pytest.fixture
+def get_user_interactor():
+    return GetUserInteractor()
+
+
+@pytest.fixture
+def get_user_list_interactor():
+    return GetUserListInteractor()
 
 
 @pytest.fixture
