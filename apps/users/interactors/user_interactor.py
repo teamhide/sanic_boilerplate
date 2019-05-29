@@ -14,6 +14,10 @@ class UserInteractor:
         self.converter = UserInteractorConverter()
         self.token = TokenHelper()
 
+    async def _create_hash(self, password: str) -> str:
+        salt = bcrypt.gensalt()
+        return str(bcrypt.hashpw(password=password.encode('utf8'), salt=salt))
+
 
 class LoginInteractor(UserInteractor):
     async def execute(self, dto: LoginUserDto) -> Union[str, NoReturn]:
@@ -61,20 +65,25 @@ class CreateUserInteractor(UserInteractor):
         await self.repository.save_user(entity=user_entity)
         return user_entity
 
-    async def _create_hash(self, password: str) -> str:
-        salt = bcrypt.gensalt()
-        return str(bcrypt.hashpw(password=password.encode('utf8'), salt=salt))
-
 
 class UpdateUserInteractor(UserInteractor):
-    def execute(self, dto: UpdateUserDto) -> Union[UserEntity, NoReturn]:
+    def execute(self, user_id: int, dto: UpdateUserDto) -> Union[UserEntity, NoReturn]:
         """
         유저를 수정하는 함수
 
+        :param user_id: int
         :param dto: UpdateUserDto
         :return: UserEntity|NoReturn
         """
-        pass
+
+        query = {'user_id': user_id, 'password': self._create_hash(password=dto.password)}
+        user = await self.repository.get_user(query=query)
+        if user is None:
+            raise DoNotHavePermissionException
+
+        query.clear()
+        query = {dto.target_field: dto.value}
+        return self.repository.update_user(user_id=user_id, query=query)
 
 
 class BlockUserInteractor(UserInteractor):

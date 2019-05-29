@@ -1,8 +1,8 @@
 import pytest
 from core.tests import app
-from apps.users.tests import create_user, user_data_1, login_interactor, create_user_interactor, update_user_interactor,\
-    block_user_interactor, deactivate_user_interactor, update_user_to_admin_interactor, get_user_interactor,\
-    get_user_list_interactor
+from apps.users.tests import create_user, user_data_1, login_interactor, create_user_interactor,\
+    update_user_interactor, block_user_interactor, deactivate_user_interactor, update_user_to_admin_interactor,\
+    get_user_interactor, get_user_list_interactor
 from apps.users.dtos import LoginUserDto, CreateUserDto, UpdateUserDto, UpdateUserStateDto
 
 
