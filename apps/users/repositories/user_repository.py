@@ -1,3 +1,4 @@
+from typing import Optional
 import abc
 from core.converters.user_converter import UserRepositoryConverter
 from core.exceptions import NotFoundException
@@ -17,7 +18,11 @@ class UserRepository:
         pass
 
     @abc.abstractmethod
-    async def get_user(self, user_id: int) -> UserEntity:
+    async def get_user(self, query: dict) -> UserEntity:
+        pass
+
+    @abc.abstractmethod
+    async def get_user_by_id(self, user_id: int) -> UserEntity:
         pass
 
     @abc.abstractmethod
@@ -25,7 +30,7 @@ class UserRepository:
         pass
 
     @abc.abstractmethod
-    async def user_login(self, email: str, password: str, join_type: str) -> UserEntity:
+    async def user_login(self, email: str, password: str, join_type: str) -> Optional[UserEntity]:
         pass
 
 
@@ -44,7 +49,13 @@ class UserPGRepository(UserRepository):
         await user.update(**query).apply()
         return self.converter.user_model_to_entity(model=user)
 
-    async def get_user(self, user_id: int) -> UserEntity:
+    async def get_user(self, query: dict) -> UserEntity:
+        user = await User.query.gino.first(**query)
+        if user is None:
+            raise NotFoundException
+        return self.converter.user_model_to_entity(model=user)
+
+    async def get_user_by_id(self, user_id: int) -> UserEntity:
         user = await User.get(user_id)
         if user is None:
             raise NotFoundException
@@ -60,6 +71,8 @@ class UserPGRepository(UserRepository):
         ]
         return user_entity
 
-    async def user_login(self, email: str, password: str, join_type: str) -> UserEntity:
-        user = await User.get(email=email, password=password, join_type=join_type)
+    async def user_login(self, email: str, password: str, join_type: str) -> Optional[UserEntity]:
+        user = await User.query.gino.first(email=email, password=password, join_type=join_type)
+        if user is None:
+            return None
         return self.converter.user_model_to_entity(model=user)

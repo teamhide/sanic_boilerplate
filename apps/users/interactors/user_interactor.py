@@ -24,7 +24,7 @@ class LoginInteractor(UserInteractor):
         :return: token|NoReturn
         """
         user = await self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
-        if user is False:
+        if user is None:
             raise LoginFailException
 
         if not await self._check_password(password=dto.password, stored_hash=user.password):
@@ -88,7 +88,7 @@ class BlockUserInteractor(UserInteractor):
 
         payload = self.token.decode(token=dto.token)
 
-        is_admin = await self.repository.get_user(user_id=payload.get('user_id'))
+        is_admin = await self.repository.get_user_by_id(user_id=payload.get('user_id'))
         if is_admin is False:
             raise DoNotHavePermissionException
 
@@ -108,7 +108,7 @@ class DeactivateUserInteractor(UserInteractor):
 
         payload = self.token.decode(token=dto.token)
 
-        is_admin = self.repository.get_user(user_id=payload.get('user_id'))
+        is_admin = self.repository.get_user_by_id(user_id=payload.get('user_id'))
         if is_admin is False:
             raise DoNotHavePermissionException
 
@@ -128,7 +128,7 @@ class UpdateUserToAdminInteractor(UserInteractor):
 
         payload = self.token.decode(token=dto.token)
 
-        is_admin = self.repository.get_user(user_id=payload.get('user_id'))
+        is_admin = self.repository.get_user_by_id(user_id=payload.get('user_id'))
         if is_admin is False:
             raise DoNotHavePermissionException
 
@@ -146,7 +146,7 @@ class GetUserInteractor(UserInteractor):
         :return: UserEntity|NoReturn
         """
 
-        return await self.repository.get_user(user_id=user_id)
+        return await self.repository.get_user_by_id(user_id=user_id)
 
 
 class GetUserListInteractor(UserInteractor):
