@@ -16,7 +16,7 @@ class DevelopmentConfig(Config):
         DB_HOST = 'db'
     else:
         DB_HOST = '127.0.0.1'
-    DB_DATABASE = 'sanic'
+    DB_DATABASE = 'develop'
     DB_USER = 'sanic'
     DB_PASSWORD = 'sanic'
 
@@ -30,7 +30,7 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     DB_HOST = '127.0.0.1'
-    DB_DATABASE = 'sanic'
+    DB_DATABASE = 'test'
     DB_USER = 'sanic'
     DB_PASSWORD = 'sanic'
 

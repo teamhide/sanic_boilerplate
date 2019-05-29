@@ -31,6 +31,7 @@ async def create_user():
 
     )
 
+
 @pytest.fixture
 def dto():
     return
