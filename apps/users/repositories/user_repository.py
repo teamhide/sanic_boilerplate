@@ -1,6 +1,6 @@
 from typing import Optional
 import abc
-from core.converters.user_converter import UserRepositoryConverter
+from core.utils.converters.user_converter import UserRepositoryConverter
 from core.exceptions import NotFoundException
 from apps.users.models import User
 from apps.users.entities import UserEntity
