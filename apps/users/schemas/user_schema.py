@@ -18,8 +18,18 @@ class UpdateUserRequestSchema(BaseSchema):
     value = fields.Str()
 
 
+class LoginRequestSchema(BaseSchema):
+    email = fields.Email()
+    password = fields.Str()
+    join_type = fields.Str()
+
+
 # Response Serializer
 class UserResponseSchema(BaseSchema):
     email = fields.Email()
     nickname = fields.Str()
     gender = fields.Str()
+
+
+class LoginResponseSchema(BaseSchema):
+    token = fields.Str()

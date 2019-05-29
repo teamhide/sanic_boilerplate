@@ -19,7 +19,7 @@ class UpdateUserDto:
 
 
 @dataclass
-class LoginUserDto:
+class LoginDto:
     email: str = None
     password: str = None
     join_type: str = None

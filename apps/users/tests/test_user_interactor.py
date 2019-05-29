@@ -2,20 +2,20 @@ import pytest
 from core.tests import app
 from apps.users.tests import create_user, user_data_1, login_interactor, create_user_interactor,\
     update_user_interactor, block_user_interactor, deactivate_user_interactor, update_user_to_admin_interactor,\
-    get_user_interactor, get_user_list_interactor
-from apps.users.dtos import LoginUserDto, CreateUserDto, UpdateUserDto, UpdateUserStateDto
+    get_user_interactor, get_user_list_interactor, repository, user_entity
+from apps.users.dtos import LoginDto, CreateUserDto, UpdateUserDto, UpdateUserStateDto
 
 
-async def test_login_interactor(app, login_interactor, create_user):
-    # TODO: Hash 패스워드 삽입 후 비교 필요
-    pass
-    # dto = LoginUserDto(
-    #     email=user_data_1['email'],
-    #     password=user_data_1['password'],
-    #     join_type=user_data_1['join_type']
-    # )
-    # result = await login_interactor.execute(dto=dto)
+async def test_login_interactor(app, repository, user_entity, login_interactor):
+    user = await repository.save_user(entity=user_entity)
+    dto = LoginDto(
+        email=user_data_1['email'],
+        password=user_data_1['password'],
+        join_type=user_data_1['join_type']
+    )
+    result = await login_interactor.execute(dto=dto)
     # print(result)
+#     pass
 
 
 async def test_create_user_interactor(app, create_user_interactor):

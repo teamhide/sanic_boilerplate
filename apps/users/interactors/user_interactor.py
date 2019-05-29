@@ -4,7 +4,7 @@ from core.utils.converters.user_converter import UserInteractorConverter
 from core.exceptions import DoNotHavePermissionException, LoginFailException
 from core.utils import TokenHelper, QueryBuilder
 from apps.users.repositories import UserPGRepository
-from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginUserDto, UserListDto, UpdateUserStateDto
+from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginDto, UserListDto, UpdateUserStateDto
 from apps.users.entities import UserEntity
 
 
@@ -21,13 +21,15 @@ class UserInteractor:
 
 
 class LoginInteractor(UserInteractor):
-    async def execute(self, dto: LoginUserDto) -> Union[str, NoReturn]:
+    async def execute(self, dto: LoginDto) -> Union[str, NoReturn]:
         """
         유저 로그인 함수
 
         :param dto: CreateUserDto
         :return: token|NoReturn
         """
+
+        # TODO: 아래 함수 수정 필요
         user = await self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
         if user is None:
             raise LoginFailException
@@ -38,7 +40,7 @@ class LoginInteractor(UserInteractor):
         return self.token.encode(user_id=user.id)
 
     async def _check_password(self, password: str, stored_hash: str) -> bool:
-        return await bcrypt.hashpw(password.encode('utf8'), stored_hash.encode('utf8')) == stored_hash
+        return await bcrypt.hashpw(password.encode('utf8'), stored_hash.encode('utf8')) == stored_hash.encode('utf8')
 
 
 class CreateUserInteractor(UserInteractor):

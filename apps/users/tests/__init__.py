@@ -18,7 +18,7 @@ user_data_1 = {
 }
 user_data_2 = {
     'email': 'test@gmail.com',
-    'password': '12345',
+    'password': '123',
     'nickname': 'test',
     'gender': 'F',
     'join_type': 'facebook',
