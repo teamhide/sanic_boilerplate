@@ -33,7 +33,7 @@ class LoginInteractor(UserInteractor):
         return self.token.encode(user_id=user.id)
 
     async def _check_password(self, password: str, stored_hash: str) -> bool:
-        return await bcrypt.hashpw(password.encode('utf8'), stored_hash) == stored_hash
+        return await bcrypt.hashpw(password.encode('utf8'), stored_hash.encode('utf8')) == stored_hash
 
 
 class CreateUserInteractor(UserInteractor):

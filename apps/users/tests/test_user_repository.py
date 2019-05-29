@@ -2,65 +2,8 @@ import pytest
 from core.tests import app
 from apps.users.models import User
 from apps.users.entities import UserEntity
-from apps.users.dtos import UserListDto, LoginUserDto
 from apps.users.repositories import UserPGRepository
-
-
-user_data_1 = {
-    'email': 'sharehead@gmail.com',
-    'password': '123',
-    'nickname': 'hide',
-    'gender': 'M',
-    'join_type': 'default',
-    'is_active': False,
-    'is_block': False,
-    'is_admin': False
-}
-user_data_2 = {
-    'email': 'test@gmail.com',
-    'password': '12345',
-    'nickname': 'test',
-    'gender': 'F',
-    'join_type': 'facebook',
-    'is_active': True,
-    'is_block': False,
-    'is_admin': True
-}
-
-
-@pytest.fixture
-def user_entity():
-    return UserEntity(
-        email=user_data_1['email'],
-        password=user_data_1['password'],
-        nickname=user_data_1['nickname'],
-        gender=user_data_1['gender'],
-        join_type=user_data_1['join_type'],
-        is_active=user_data_1['is_active'],
-        is_block=user_data_1['is_block'],
-        is_admin=user_data_1['is_admin'],
-    )
-
-
-@pytest.fixture
-def repository():
-    return UserPGRepository()
-
-
-@pytest.fixture
-async def create_user():
-    await User.create(**user_data_1)
-
-
-@pytest.fixture
-async def create_user_list():
-    await User.create(**user_data_1)
-    await User.create(**user_data_2)
-
-
-@pytest.fixture
-def dto():
-    return
+from apps.users.tests import repository, user_data_1, user_data_2, create_user, user_entity, create_user_list
 
 
 async def test_save_user(app, user_entity: UserEntity, repository: UserPGRepository):
@@ -121,7 +64,7 @@ async def test_get_user_list(app, create_user_list, repository: UserPGRepository
     assert users[1].is_admin == user_data_2['is_admin']
 
 
-async def test_user_login(app, create_user, dto: LoginUserDto, repository: UserPGRepository):
+async def test_user_login(app, create_user, repository: UserPGRepository):
     user = await repository.user_login(
         email=user_data_1['email'],
         password=user_data_1['password'],
