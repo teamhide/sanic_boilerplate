@@ -1,0 +1,25 @@
+version: "3"
+services:
+  api:
+    image: your_ecr_url
+    ports:
+      - "0:8000"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: api
+        awslogs-region: ap-northeast-2
+        awslogs-stream-prefix: api
+
+  nginx:
+    image: your_ecr_url
+    ports:
+      - "0:80"
+    links:
+      - api
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: nginx
+        awslogs-region: ap-northeast-2
+        awslogs-stream-prefix: nginx
