@@ -1,10 +1,10 @@
 import bcrypt
 from typing import Union, NoReturn, Optional, List
-from core.converters.user_converter import UserInteractorConverter
+from core.utils.converters.user_converter import UserInteractorConverter
 from core.exceptions import DoNotHavePermissionException, LoginFailException
-from core.utils import TokenHelper
+from core.utils import TokenHelper, QueryBuilder
 from apps.users.repositories import UserPGRepository
-from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginUserDto, UserListDto, UpdateUserStateDto
+from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginDto, UserListDto, UpdateUserStateDto
 from apps.users.entities import UserEntity
 
 
@@ -13,16 +13,23 @@ class UserInteractor:
         self.repository = UserPGRepository()
         self.converter = UserInteractorConverter()
         self.token = TokenHelper()
+        self.builder = QueryBuilder()
+
+    async def _create_hash(self, password: str) -> str:
+        salt = bcrypt.gensalt()
+        return str(bcrypt.hashpw(password=password.encode('utf8'), salt=salt))
 
 
 class LoginInteractor(UserInteractor):
-    async def execute(self, dto: LoginUserDto) -> Union[str, NoReturn]:
+    async def execute(self, dto: LoginDto) -> Union[str, NoReturn]:
         """
         유저 로그인 함수
 
         :param dto: CreateUserDto
         :return: token|NoReturn
         """
+
+        # TODO: 아래 함수 수정 필요
         user = await self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
         if user is None:
             raise LoginFailException
@@ -33,7 +40,7 @@ class LoginInteractor(UserInteractor):
         return self.token.encode(user_id=user.id)
 
     async def _check_password(self, password: str, stored_hash: str) -> bool:
-        return await bcrypt.hashpw(password.encode('utf8'), stored_hash.encode('utf8')) == stored_hash
+        return await bcrypt.hashpw(password.encode('utf8'), stored_hash.encode('utf8')) == stored_hash.encode('utf8')
 
 
 class CreateUserInteractor(UserInteractor):
@@ -61,20 +68,25 @@ class CreateUserInteractor(UserInteractor):
         await self.repository.save_user(entity=user_entity)
         return user_entity
 
-    async def _create_hash(self, password: str) -> str:
-        salt = bcrypt.gensalt()
-        return str(bcrypt.hashpw(password=password.encode('utf8'), salt=salt))
-
 
 class UpdateUserInteractor(UserInteractor):
-    def execute(self, dto: UpdateUserDto) -> Union[UserEntity, NoReturn]:
+    async def execute(self, user_id: int, dto: UpdateUserDto) -> Union[UserEntity, NoReturn]:
         """
         유저를 수정하는 함수
 
+        :param user_id: int
         :param dto: UpdateUserDto
         :return: UserEntity|NoReturn
         """
-        pass
+
+        self.builder.user_id = user_id
+        self.builder.password = self._create_hash(password=dto.password)
+        user = await self.repository.get_user(query=self.builder.query())
+        if user is None:
+            raise DoNotHavePermissionException
+
+        query = {dto.target_field: dto.value}
+        return self.repository.update_user(user_id=user_id, query=query)
 
 
 class BlockUserInteractor(UserInteractor):
@@ -92,9 +104,8 @@ class BlockUserInteractor(UserInteractor):
         if is_admin is False:
             raise DoNotHavePermissionException
 
-        query = {'is_block': True}
-
-        await self.repository.update_user(user_id=dto.user_id, query=query)
+        self.builder.is_block = True
+        await self.repository.update_user(user_id=dto.user_id, query=self.builder.query())
 
 
 class DeactivateUserInteractor(UserInteractor):
@@ -112,9 +123,8 @@ class DeactivateUserInteractor(UserInteractor):
         if is_admin is False:
             raise DoNotHavePermissionException
 
-        query = {'is_active': False}
-
-        await self.repository.update_user(user_id=dto.user_id, query=query)
+        self.builder.is_active = False
+        await self.repository.update_user(user_id=dto.user_id, query=self.builder.query())
 
 
 class UpdateUserToAdminInteractor(UserInteractor):
@@ -132,9 +142,8 @@ class UpdateUserToAdminInteractor(UserInteractor):
         if is_admin is False:
             raise DoNotHavePermissionException
 
-        query = {'is_admin': True}
-
-        await self.repository.update_user(user_id=dto.user_id, query=query)
+        self.builder.is_admin = True
+        await self.repository.update_user(user_id=dto.user_id, query=self.builder.query())
 
 
 class GetUserInteractor(UserInteractor):
@@ -157,5 +166,4 @@ class GetUserListInteractor(UserInteractor):
         :param dto: UserListDto
         :return: List[UserEntity]|NoReturn
         """
-
-        return await self.repository.get_user_list(**dto.__dict__)
+        return await self.repository.get_user_list(offset=dto.offset, limit=dto.limit)

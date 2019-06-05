@@ -1,7 +1,7 @@
 from typing import Optional
 import abc
-from core.converters.user_converter import UserRepositoryConverter
 from core.exceptions import NotFoundException, AlreadyExistException
+from core.utils.converters.user_converter import UserRepositoryConverter
 from apps.users.models import User
 from apps.users.entities import UserEntity
 
@@ -74,6 +74,7 @@ class UserPGRepository(UserRepository):
         return user_entity
 
     async def user_login(self, email: str, password: str, join_type: str) -> Optional[UserEntity]:
+        # TODO: 쿼리 조건 수정 필요
         user = await User.query.gino.first(email=email, password=password, join_type=join_type)
         if user is None:
             return None
