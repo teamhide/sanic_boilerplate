@@ -10,6 +10,10 @@ class UserRepository:
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
+    async def _user_is_exist(self, entity: UserEntity) -> bool:
+        pass
+
+    @abc.abstractmethod
     async def save_user(self, entity: UserEntity) -> UserEntity:
         pass
 
@@ -38,10 +42,16 @@ class UserPGRepository(UserRepository):
     def __init__(self):
         self.converter = UserRepositoryConverter()
 
+    async def _user_is_exist(self, entity: UserEntity) -> bool:
+        user = await User.query.where(User.email == entity.email).gino.first()
+        if user:
+            return True
+        return False
+
     async def save_user(self, entity: UserEntity) -> UserEntity:
-        is_exist = await User.query.where(User.email == entity.email).gino.first()
-        if is_exist:
+        if self._user_is_exist(entity=entity):
             raise AlreadyExistException
+
         user_dict = self.converter.user_entity_to_dict(entity=entity)
         user = await User.create(**user_dict)
         return self.converter.user_model_to_entity(model=user)
