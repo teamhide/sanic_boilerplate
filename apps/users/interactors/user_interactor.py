@@ -29,7 +29,7 @@ class LoginInteractor(UserInteractor):
         :return: token|NoReturn
         """
 
-        # TODO: 아래 함수 수정 필요
+        # TODO: 아래에서 패스워드 해쉬화해서 보내줘야함
         user = await self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
         if user is None:
             raise LoginFailException
@@ -166,4 +166,5 @@ class GetUserListInteractor(UserInteractor):
         :param dto: UserListDto
         :return: List[UserEntity]|NoReturn
         """
+
         return await self.repository.get_user_list(offset=dto.offset, limit=dto.limit)
