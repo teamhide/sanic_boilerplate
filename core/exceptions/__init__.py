@@ -62,3 +62,10 @@ class UnknownFieldException(SanicException):
     def __init__(self):
         message = 'Unknown field inside request'
         super().__init__(message=message)
+
+
+@add_status_code(401)
+class AlreadyExistException(SanicException):
+    def __init__(self):
+        message = 'Already exist'
+        super().__init__(message=message)

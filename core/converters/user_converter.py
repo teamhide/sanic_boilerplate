@@ -16,4 +16,6 @@ class UserRepositoryConverter(Converter):
         return self.entity_to_model(entity=entity, model=User)
 
     def user_entity_to_dict(self, entity: UserEntity) -> dict:
-        return entity.__dict__
+        user_dict = entity.__dict__
+        user_dict.pop('id')
+        return user_dict

@@ -1,7 +1,7 @@
 from typing import Optional
 import abc
 from core.converters.user_converter import UserRepositoryConverter
-from core.exceptions import NotFoundException
+from core.exceptions import NotFoundException, AlreadyExistException
 from apps.users.models import User
 from apps.users.entities import UserEntity
 
@@ -39,9 +39,11 @@ class UserPGRepository(UserRepository):
         self.converter = UserRepositoryConverter()
 
     async def save_user(self, entity: UserEntity) -> UserEntity:
-        user = self.converter.user_entity_to_dict(entity=entity)
-        user.pop('id')
-        user = await User.create(**user)
+        is_exist = await User.query.where(User.email == entity.email).gino.first()
+        if is_exist:
+            raise AlreadyExistException
+        user_dict = self.converter.user_entity_to_dict(entity=entity)
+        user = await User.create(**user_dict)
         return self.converter.user_model_to_entity(model=user)
 
     async def update_user(self, user_id: int, query: dict) -> UserEntity:
