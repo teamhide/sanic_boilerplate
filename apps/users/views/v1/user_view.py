@@ -28,7 +28,7 @@ class User(HTTPMethodView):
         if validator.errors:
             raise ValidationErrorException
         dto = UpdateUserDto(**validator.data)
-        user = await UpdateUserInteractor().execute(dto=dto)
+        user = await UpdateUserInteractor().execute(user_id=user_id, dto=dto)
         schema = UserResponseSchema().dump(user).data
         return Response(body=schema)
 
