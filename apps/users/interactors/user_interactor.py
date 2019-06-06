@@ -29,8 +29,8 @@ class LoginInteractor(UserInteractor):
         :return: token|NoReturn
         """
 
-        # TODO: 아래에서 패스워드 해쉬화해서 보내줘야함
-        user = await self.repository.user_login(email=dto.email, password=dto.password, join_type=dto.join_type)
+        hashed_password = await self._create_hash(password=dto.password)
+        user = await self.repository.user_login(email=dto.email, password=hashed_password, join_type=dto.join_type)
         if user is None:
             raise LoginFailException
 
