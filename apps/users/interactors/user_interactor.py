@@ -1,7 +1,7 @@
 import bcrypt
 from typing import Union, NoReturn, Optional, List
 from core.utils.converters.user_converter import UserInteractorConverter
-from core.exceptions import DoNotHavePermissionException, LoginFailException
+from core.exceptions import PermissionErrorException, LoginFailException
 from core.utils import TokenHelper, QueryBuilder
 from apps.users.repositories import UserPGRepository
 from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginDto, UserListDto, UpdateUserStateDto
@@ -35,7 +35,7 @@ class LoginInteractor(UserInteractor):
             raise LoginFailException
 
         if not await self._check_password(password=dto.password, stored_hash=user.password):
-            raise DoNotHavePermissionException
+            raise PermissionErrorException
 
         return self.token.encode(user_id=user.id)
 
@@ -53,7 +53,7 @@ class CreateUserInteractor(UserInteractor):
         """
 
         if dto.password1 != dto.password2:
-            raise DoNotHavePermissionException
+            raise PermissionErrorException
 
         hashed_password = await self._create_hash(password=dto.password1)
 
@@ -83,7 +83,7 @@ class UpdateUserInteractor(UserInteractor):
         self.builder.password = self._create_hash(password=dto.password)
         user = await self.repository.get_user(query=self.builder.query())
         if user is None:
-            raise DoNotHavePermissionException
+            raise PermissionErrorException
 
         query = {dto.target_field: dto.value}
         return self.repository.update_user(user_id=user_id, query=query)
@@ -102,7 +102,7 @@ class BlockUserInteractor(UserInteractor):
 
         is_admin = await self.repository.get_user_by_id(user_id=payload.get('user_id'))
         if is_admin is False:
-            raise DoNotHavePermissionException
+            raise PermissionErrorException
 
         self.builder.is_block = True
         await self.repository.update_user(user_id=dto.user_id, query=self.builder.query())
@@ -121,7 +121,7 @@ class DeactivateUserInteractor(UserInteractor):
 
         is_admin = self.repository.get_user_by_id(user_id=payload.get('user_id'))
         if is_admin is False:
-            raise DoNotHavePermissionException
+            raise PermissionErrorException
 
         self.builder.is_active = False
         await self.repository.update_user(user_id=dto.user_id, query=self.builder.query())
@@ -140,7 +140,7 @@ class UpdateUserToAdminInteractor(UserInteractor):
 
         is_admin = self.repository.get_user_by_id(user_id=payload.get('user_id'))
         if is_admin is False:
-            raise DoNotHavePermissionException
+            raise PermissionErrorException
 
         self.builder.is_admin = True
         await self.repository.update_user(user_id=dto.user_id, query=self.builder.query())

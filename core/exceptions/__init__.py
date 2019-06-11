@@ -9,9 +9,9 @@ class NotFoundException(SanicException):
 
 
 @add_status_code(401)
-class DoNotHavePermissionException(SanicException):
+class PermissionErrorException(SanicException):
     def __init__(self):
-        message = 'Do not have permission'
+        message = 'Permission error'
         super().__init__(message)
 
 
