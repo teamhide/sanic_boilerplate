@@ -1,7 +1,9 @@
+import requests
 import bcrypt
 from typing import Union, NoReturn, Optional, List
 from core.utils.converters.user_converter import UserInteractorConverter
-from core.exceptions import PermissionErrorException, LoginFailException, InvalidJoinTypeException
+from core.exceptions import PermissionErrorException, LoginFailException, InvalidJoinTypeException, \
+    SocialLoginFailException
 from core.utils import TokenHelper, QueryBuilder
 from apps.users.repositories import UserPGRepository
 from apps.users.dtos import RegisterUserDto, UpdateUserDto, LoginDto, UserListDto, UpdateUserStateDto
@@ -44,6 +46,14 @@ class LoginInteractor(UserInteractor):
 
 
 class RegisterUserInteractor(UserInteractor):
+    def __init__(self):
+        super().__init__()
+        self.kakao_url = 'https://kauth.kakao.com/oauth/token'
+        self.facebook_url = 'http://facebook.com'
+        self.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+
     async def execute(self, dto: RegisterUserDto) -> Union[UserEntity, NoReturn]:
         """
         유저 회원가입 함수
@@ -77,13 +87,31 @@ class RegisterUserInteractor(UserInteractor):
         await self.repository.save_user(entity=user_entity)
         return user_entity
 
-    async def _register_by_kakao(self, dto: RegisterUserDto):
-        # TODO: 카카오 회원가입 연동 필요
-        pass
+    async def _register_by_kakao(self, dto: RegisterUserDto) -> bool:
+        # TODO: 소셜 로그인 연동 필요
+        data = {'email': dto.email, 'password': dto.password1}
+        req = requests.post(url=self.kakao_url, data=data, headers=self.headers)
 
-    async def _register_by_facebook(self, dto: RegisterUserDto):
-        # TODO: 페이스북 회원가입 연동 필요
-        pass
+        if req.status_code != 200:
+            raise SocialLoginFailException
+
+        access_token = req.text.encode('utf8')
+        if not access_token:
+            raise SocialLoginFailException
+        return True
+
+    async def _register_by_facebook(self, dto: RegisterUserDto) -> bool:
+        # TODO: 소셜 로그인 연동 필요
+        data = {'email': dto.email, 'password': dto.password1}
+        req = requests.post(url=self.facebook_url, data=data, headers=self.headers)
+
+        if req.status_code != 200:
+            raise SocialLoginFailException
+
+        access_token = req.text.encode('utf8')
+        if not access_token:
+            raise SocialLoginFailException
+        return True
 
     async def _register_by_default(self, dto: RegisterUserDto):
         pass
