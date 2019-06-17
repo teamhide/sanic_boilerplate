@@ -8,9 +8,9 @@ from core.responses import Response
 from core.utils import TokenHelper
 from apps.users.schemas import CreateUserRequestSchema, UserResponseSchema, UpdateUserRequestSchema,\
     LoginRequestSchema, LoginResponseSchema
-from apps.users.dtos import CreateUserDto, UpdateUserDto, UserListDto, UpdateUserStateDto,\
+from apps.users.dtos import RegisterUserDto, UpdateUserDto, UserListDto, UpdateUserStateDto,\
     LoginDto
-from apps.users.interactors import CreateUserInteractor, UpdateUserInteractor, GetUserInteractor,\
+from apps.users.interactors import RegisterUserInteractor, UpdateUserInteractor, GetUserInteractor,\
     GetUserListInteractor, BlockUserInteractor, DeactivateUserInteractor, UpdateUserToAdminInteractor,\
     LoginInteractor
 
@@ -49,8 +49,8 @@ class UserList(HTTPMethodView):
         validator = CreateUserRequestSchema().load(data=request.form)
         if validator.errors:
             raise ValidationErrorException
-        dto = CreateUserDto(**validator.data)
-        user = await CreateUserInteractor().execute(dto=dto)
+        dto = RegisterUserDto(**validator.data)
+        user = await RegisterUserInteractor().execute(dto=dto)
         schema = UserResponseSchema().dump(user).data
         return Response(body=schema)
 
