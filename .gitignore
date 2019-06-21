@@ -2,3 +2,4 @@ __pycache__/
 .idea/
 docker/data/
 .pytest_cache/
+dump.rdb
