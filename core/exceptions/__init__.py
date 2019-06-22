@@ -69,3 +69,10 @@ class AlreadyExistException(SanicException):
     def __init__(self):
         message = 'Already exist'
         super().__init__(message=message)
+
+
+@add_status_code(500)
+class ServerErrorException(SanicException):
+    def __init__(self):
+        message = 'Server error'
+        super().__init__(message=message)
