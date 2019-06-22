@@ -1,10 +1,12 @@
+import requests
 import bcrypt
 from typing import Union, NoReturn, Optional, List
 from core.utils.converters.user_converter import UserInteractorConverter
-from core.exceptions import PermissionErrorException, LoginFailException
+from core.exceptions import PermissionErrorException, LoginFailException, InvalidJoinTypeException, \
+    SocialLoginFailException
 from core.utils import TokenHelper, QueryBuilder
 from apps.users.repositories import UserPGRepository
-from apps.users.dtos import CreateUserDto, UpdateUserDto, LoginDto, UserListDto, UpdateUserStateDto
+from apps.users.dtos import RegisterUserDto, UpdateUserDto, LoginDto, UserListDto, UpdateUserStateDto
 from apps.users.entities import UserEntity
 
 
@@ -43,10 +45,18 @@ class LoginInteractor(UserInteractor):
         return await bcrypt.hashpw(password.encode('utf8'), stored_hash.encode('utf8')) == stored_hash.encode('utf8')
 
 
-class CreateUserInteractor(UserInteractor):
-    async def execute(self, dto: CreateUserDto) -> Union[UserEntity, NoReturn]:
+class RegisterUserInteractor(UserInteractor):
+    def __init__(self):
+        super().__init__()
+        self.kakao_url = 'https://kauth.kakao.com/oauth/token'
+        self.facebook_url = 'http://facebook.com'
+        self.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+
+    async def execute(self, dto: RegisterUserDto) -> Union[UserEntity, NoReturn]:
         """
-        유저를 생성하는 함수
+        유저 회원가입 함수
 
         :param dto: CreateUserDto
         :return: UserEntity|NoReturn
@@ -54,6 +64,15 @@ class CreateUserInteractor(UserInteractor):
 
         if dto.password1 != dto.password2:
             raise PermissionErrorException
+
+        if dto.join_type == 'kakao':
+            await self._register_by_kakao(dto=dto)
+        elif dto.join_type == 'facebook':
+            await self._register_by_facebook(dto=dto)
+        elif dto.join_type == 'default':
+            await self._register_by_default(dto=dto)
+        else:
+            raise InvalidJoinTypeException
 
         hashed_password = await self._create_hash(password=dto.password1)
 
@@ -67,6 +86,35 @@ class CreateUserInteractor(UserInteractor):
 
         await self.repository.save_user(entity=user_entity)
         return user_entity
+
+    async def _register_by_kakao(self, dto: RegisterUserDto) -> bool:
+        # TODO: 소셜 로그인 연동 필요
+        data = {'email': dto.email, 'password': dto.password1}
+        req = requests.post(url=self.kakao_url, data=data, headers=self.headers)
+
+        if req.status_code != 200:
+            raise SocialLoginFailException
+
+        access_token = req.text.encode('utf8')
+        if not access_token:
+            raise SocialLoginFailException
+        return True
+
+    async def _register_by_facebook(self, dto: RegisterUserDto) -> bool:
+        # TODO: 소셜 로그인 연동 필요
+        data = {'email': dto.email, 'password': dto.password1}
+        req = requests.post(url=self.facebook_url, data=data, headers=self.headers)
+
+        if req.status_code != 200:
+            raise SocialLoginFailException
+
+        access_token = req.text.encode('utf8')
+        if not access_token:
+            raise SocialLoginFailException
+        return True
+
+    async def _register_by_default(self, dto: RegisterUserDto):
+        pass
 
 
 class UpdateUserInteractor(UserInteractor):
