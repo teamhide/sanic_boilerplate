@@ -72,7 +72,7 @@ class BlockUser(HTTPMethodView):
     decorators = [is_jwt_authenticated()]
 
     async def post(self, request: Request, user_id: int) -> Union[Response, NoReturn]:
-        token = TokenHelper().extract_from_request(request=request)
+        token = TokenHelper.extract_from_request(request=request)
         dto = UpdateUserStateDto(token=token, user_id=user_id)
         await BlockUserInteractor().execute(dto=dto)
         return Response(body={'result': True})
@@ -82,7 +82,7 @@ class DeactivateUser(HTTPMethodView):
     decorators = [is_jwt_authenticated()]
 
     async def post(self, request: Request, user_id: int) -> Union[Response, NoReturn]:
-        token = TokenHelper().extract_from_request(request=request)
+        token = TokenHelper.extract_from_request(request=request)
         dto = UpdateUserStateDto(token=token, user_id=user_id)
         await DeactivateUserInteractor().execute(dto=dto)
         return Response(body={'result': True})
@@ -92,7 +92,7 @@ class UpdateUserToAdmin(HTTPMethodView):
     decorators = [is_jwt_authenticated()]
 
     async def post(self, request: Request, user_id: int) -> Union[Response, NoReturn]:
-        token = TokenHelper().extract_from_request(request=request)
+        token = TokenHelper.extract_from_request(request=request)
         dto = UpdateUserStateDto(token=token, user_id=user_id)
         await UpdateUserToAdminInteractor().execute(dto=dto)
         return Response(body={'result': True})
