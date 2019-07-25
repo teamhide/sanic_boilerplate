@@ -14,6 +14,7 @@ pyjwt = "*"
 pytest-sanic = "*"
 bcrypt = "*"
 requests = "*"
+dacite = "*"
 
 [requires]
 python_version = "3.7"
