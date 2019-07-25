@@ -1,38 +1,35 @@
 import os
+from dataclasses import dataclass
 
 
 IS_DOCKER = os.getenv('IS_DOCKER', 'false')
 
 
+@dataclass(frozen=True)
 class Config:
-    DB_HOST = '127.0.0.1'
-    DB_DATABASE = 'sanic'
-    DB_USER = 'sanic'
-    DB_PASSWORD = 'sanic'
+    DB_HOST: str = os.getenv('DB_HOST', '127.0.0.1')
+    DB_DATABASE: str = os.getenv('DB_DATABASE', 'sanic')
+    DB_USER: str = os.getenv('DB_USER', 'sanic')
+    DB_PASSWORD: str = os.getenv('DB_PASSWORD', 'sanic')
 
 
+@dataclass(frozen=True)
 class DevelopmentConfig(Config):
     if IS_DOCKER == 'true':
-        DB_HOST = 'db'
-    else:
-        DB_HOST = '127.0.0.1'
-    DB_DATABASE = 'develop'
-    DB_USER = 'sanic'
-    DB_PASSWORD = 'sanic'
+        DB_HOST: str = 'db'
+    DB_DATABASE: str = 'develop'
+    DEBUG: bool = True
 
 
+@dataclass(frozen=True)
 class ProductionConfig(Config):
-    DB_HOST = '127.0.0.1'
-    DB_DATABASE = 'sanic'
-    DB_USER = 'sanic'
-    DB_PASSWORD = 'sanic'
+    DEBUG: bool = False
 
 
+@dataclass(frozen=True)
 class TestingConfig(Config):
-    DB_HOST = '127.0.0.1'
-    DB_DATABASE = 'test'
-    DB_USER = 'sanic'
-    DB_PASSWORD = 'sanic'
+    DB_DATABASE: str = 'test'
+    DEBUG: bool = True
 
 
 def get_connection():
